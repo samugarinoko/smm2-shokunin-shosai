@@ -74,6 +74,19 @@ clearCacheBtn.addEventListener('click', () => {
   alert('記憶した職人ID（キャッシュ）を削除しました。');
 });
 
+// Unixtime（秒）を 日時文字列（YYYY/MM/DD HH:mm:ss）に変換する関数
+function formatUnixTime(unixTimestamp) {
+  const date = new Date(unixTimestamp * 1000);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  const seconds = String(date.getSeconds()).padStart(2, '0');
+
+  return `${year}/${month}/${day} ${hours}:${minutes}:${seconds}`;
+}
+
 // バトルランクと現在のレートから「次のランク」と「目標レート」を計算する関数
 function getNextRankInfo(currentRank, rating) {
   const rankThresholds = [
@@ -151,7 +164,7 @@ document.getElementById('calcBtn').addEventListener('click', async () => {
 
     const rawText = await response.text();
 
-    // 抽出処理
+    // 既存の抽出処理
     const miiImageMatch = rawText.match(/"mii_image":\s*"([^"]+)"\s*,"mii_studio_code/);
     const nameMatch = rawText.match(/"name":\s*"([^"]+)"\s*,"country/);
     const ratingMatch = rawText.match(/"versus_rating":\s*(\d+)\s*,"versus_rank/);
@@ -161,7 +174,11 @@ document.getElementById('calcBtn').addEventListener('click', async () => {
     const winStreakMatch = rawText.match(/"versus_win_streak":\s*(\d+)\s*,"versus_lose_streak/);
     const loseStreakMatch = rawText.match(/"versus_lose_streak":\s*(\d+)\s*,"versus_plays":/);
 
-    if (!wonMatch || !lostMatch || !ratingMatch || !rankMatch || !nameMatch || !miiImageMatch || !winStreakMatch || !loseStreakMatch) {
+    // 新機能用の抽出処理
+    const lastActiveMatch = rawText.match(/"last_active":\s*(\d+)\s*,"last_active_pretty/);
+    const makerPointsMatch = rawText.match(/"maker_points":\s*(\d+)\s*,"easy_highscore/);
+
+    if (!wonMatch || !lostMatch || !ratingMatch || !rankMatch || !nameMatch || !miiImageMatch || !winStreakMatch || !loseStreakMatch || !lastActiveMatch || !makerPointsMatch) {
       errorMsg.textContent = '職人IDが間違ってるか、存在しません。';
       return;
     }
@@ -174,6 +191,9 @@ document.getElementById('calcBtn').addEventListener('click', async () => {
     const winStreak = parseInt(winStreakMatch[1], 10);
     const loseStreak = parseInt(loseStreakMatch[1], 10);
 
+    const lastActiveUnix = parseInt(lastActiveMatch[1], 10);
+    const makerPoints = parseInt(makerPointsMatch[1], 10);
+
     globalVersusWon = parseInt(wonMatch[1], 10);
     const versusLost = parseInt(lostMatch[1], 10);
     globalTotalPlayed = globalVersusWon + versusLost;
@@ -183,12 +203,16 @@ document.getElementById('calcBtn').addEventListener('click', async () => {
       return;
     }
 
-    // UIへの流し込み
+    // UIへの流し込み（基本情報 & みんバト）
     document.getElementById('miiImage').src = miiImageUrl;
     document.getElementById('userName').textContent = userName;
     document.getElementById('ratingMsg').textContent = `今のレート: ${rating}`;
     document.getElementById('rankMsg').textContent = `今のバトルランク: ${rankName}`;
     document.getElementById('winStreakMsg').textContent = `現在、${winStreak}連勝中`;
+
+    // UIへの流し込み（職人タブ用）
+    document.getElementById('lastActiveMsg').textContent = `最終ログイン: ${formatUnixTime(lastActiveUnix)}`;
+    document.getElementById('makerPointsMsg').textContent = `職人ポイント: ${makerPoints.toLocaleString()}`;
 
     // 連敗数の黒塗りリセット
     loseStreakMask.textContent = loseStreak;
