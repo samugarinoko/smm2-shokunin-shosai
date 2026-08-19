@@ -125,6 +125,14 @@ function updateCalculations() {
   const streakWinRateMsg = document.getElementById('streakWinRateMsg');
 
   const streakCount = parseInt(streakInput.value, 10) || 1;
+
+  // プレイ回数が0回の場合は勝率・連勝率を0%にする（ゼロ除算防止）
+  if (globalTotalPlayed === 0) {
+    winRateMsg.textContent = '勝率: 0.00%';
+    streakWinRateMsg.textContent = `${streakCount}連勝の勝率: 0.0000%`;
+    return;
+  }
+
   const winRatio = globalVersusWon / globalTotalPlayed;
 
   const winRate = winRatio * 100;
@@ -137,9 +145,7 @@ function updateCalculations() {
 
 // 連勝数の数値が変わったときに自動で再計算
 streakInput.addEventListener('input', () => {
-  if (globalTotalPlayed > 0) {
-    updateCalculations();
-  }
+  updateCalculations();
 });
 
 document.getElementById('calcBtn').addEventListener('click', async () => {
@@ -164,7 +170,7 @@ document.getElementById('calcBtn').addEventListener('click', async () => {
 
     const rawText = await response.text();
 
-    // 既存の抽出処理
+    // 抽出処理
     const miiImageMatch = rawText.match(/"mii_image":\s*"([^"]+)"\s*,"mii_studio_code/);
     const nameMatch = rawText.match(/"name":\s*"([^"]+)"\s*,"country/);
     const ratingMatch = rawText.match(/"versus_rating":\s*(\d+)\s*,"versus_rank/);
@@ -174,7 +180,7 @@ document.getElementById('calcBtn').addEventListener('click', async () => {
     const winStreakMatch = rawText.match(/"versus_win_streak":\s*(\d+)\s*,"versus_lose_streak/);
     const loseStreakMatch = rawText.match(/"versus_lose_streak":\s*(\d+)\s*,"versus_plays":/);
 
-    // 職人タブ用の抽出処理
+    // 職人タブ用
     const lastActiveMatch = rawText.match(/"last_active":\s*(\d+)\s*,"last_active_pretty/);
     const makerPointsMatch = rawText.match(/"maker_points":\s*(\d+)\s*,"easy_highscore/);
     const likesMatch = rawText.match(/"likes":\s*(\d+)\s*,"maker_points/);
@@ -207,11 +213,6 @@ document.getElementById('calcBtn').addEventListener('click', async () => {
     globalVersusWon = parseInt(wonMatch[1], 10);
     const versusLost = parseInt(lostMatch[1], 10);
     globalTotalPlayed = globalVersusWon + versusLost;
-
-    if (globalTotalPlayed === 0) {
-      errorMsg.textContent = 'プレイ回数が0回のため計算できません。';
-      return;
-    }
 
     // UIへの流し込み（基本情報 & みんバト）
     document.getElementById('miiImage').src = miiImageUrl;
