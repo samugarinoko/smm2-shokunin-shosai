@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>職人詳細サイト</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="card">
+    <h1 class="site-title">職人詳細サイト</h1>
+
+    <!-- 職人ID入力エリア（共通） -->
+    <div class="field">
+      <label for="makerId">職人ID</label>
+      <input type="text" id="makerId" placeholder="">
+      <div class="sub-text">世界のコースを押し、Yを押して自分のMiiをクリックしてその下の文字を入れてください</div>
+      <div class="btn-group">
+        <button id="saveIdBtn" class="sub-btn" style="display: none;">職人IDを記憶する</button>
+        <button id="clearCacheBtn" class="clear-btn" style="display: none;">キャッシュを削除する</button>
+      </div>
+    </div>
+
+    <button id="calcBtn" class="main-btn">取得＆計算</button>
+
+    <div id="errorMsg" class="error"></div>
+
+    <!-- 初期状態では非表示 -->
+    <div id="resultBox" class="result" style="display: none;">
+      <!-- Mii画像と基本情報 -->
+      <div class="user-profile">
+        <img id="miiImage" src="" alt="Mii Image" class="mii-img">
+        <div id="userName" class="user-name"></div>
+      </div>
+
+      <!-- タブ切替ボタン -->
+      <div class="tab-group">
+        <button id="tabBattleBtn" class="tab-btn active">みんバト</button>
+        <button id="tabMakerBtn" class="tab-btn">職人</button>
+      </div>
+
+      <!-- みんバトコンテンツ -->
+      <div id="battleContent" class="tab-content">
+        <!-- レート・ランク・連勝連敗情報 -->
+        <div class="info-group">
+          <div id="ratingMsg" class="result-item"></div>
+          <div id="rankMsg" class="result-item"></div>
+          <div id="nextRankMsg" class="result-item highlight"></div>
+          
+          <div id="winStreakMsg" class="result-item"></div>
+          <div class="result-item">
+            現在、<span id="loseStreakMask" class="spoiler-mask" title="クリックで表示">???</span>連敗中
+          </div>
+        </div>
+
+        <hr class="divider">
+
+        <!-- 通算戦績 -->
+        <div id="totalPlayedMsg" class="result-item"></div>
+        <div id="totalWonMsg" class="result-item"></div>
+        <div id="winRateMsg" class="result-item"></div>
+
+        <hr class="divider">
+
+        <!-- 連勝数入力＆結果 -->
+        <div class="field streak-field">
+          <label for="streakCount">連勝数（勝率計算用）</label>
+          <input type="number" id="streakCount" value="1" min="1">
+        </div>
+
+        <div id="streakWinRateMsg" class="result-item"></div>
+      </div>
+
+      <!-- 職人コンテンツ -->
+      <div id="makerContent" class="tab-content" style="display: none;">
+        <div class="result-item">test</div>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
