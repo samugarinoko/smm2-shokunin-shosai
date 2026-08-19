@@ -174,11 +174,18 @@ document.getElementById('calcBtn').addEventListener('click', async () => {
     const winStreakMatch = rawText.match(/"versus_win_streak":\s*(\d+)\s*,"versus_lose_streak/);
     const loseStreakMatch = rawText.match(/"versus_lose_streak":\s*(\d+)\s*,"versus_plays":/);
 
-    // 新機能用の抽出処理
+    // 職人タブ用の抽出処理
     const lastActiveMatch = rawText.match(/"last_active":\s*(\d+)\s*,"last_active_pretty/);
     const makerPointsMatch = rawText.match(/"maker_points":\s*(\d+)\s*,"easy_highscore/);
+    const likesMatch = rawText.match(/"likes":\s*(\d+)\s*,"maker_points/);
+    const weeklyMakerPointsMatch = rawText.match(/"weekly_maker_points":\s*(\d+)\s*,"last_uploaded_level/);
+    const uploadedLevelsMatch = rawText.match(/"uploaded_levels":\s*(\d+)\s*,"maximum_uploaded_levels/);
 
-    if (!wonMatch || !lostMatch || !ratingMatch || !rankMatch || !nameMatch || !miiImageMatch || !winStreakMatch || !loseStreakMatch || !lastActiveMatch || !makerPointsMatch) {
+    if (
+      !wonMatch || !lostMatch || !ratingMatch || !rankMatch || !nameMatch || !miiImageMatch || 
+      !winStreakMatch || !loseStreakMatch || !lastActiveMatch || !makerPointsMatch || 
+      !likesMatch || !weeklyMakerPointsMatch || !uploadedLevelsMatch
+    ) {
       errorMsg.textContent = '職人IDが間違ってるか、存在しません。';
       return;
     }
@@ -193,6 +200,9 @@ document.getElementById('calcBtn').addEventListener('click', async () => {
 
     const lastActiveUnix = parseInt(lastActiveMatch[1], 10);
     const makerPoints = parseInt(makerPointsMatch[1], 10);
+    const likes = parseInt(likesMatch[1], 10);
+    const weeklyMakerPoints = parseInt(weeklyMakerPointsMatch[1], 10);
+    const uploadedLevels = parseInt(uploadedLevelsMatch[1], 10);
 
     globalVersusWon = parseInt(wonMatch[1], 10);
     const versusLost = parseInt(lostMatch[1], 10);
@@ -213,6 +223,9 @@ document.getElementById('calcBtn').addEventListener('click', async () => {
     // UIへの流し込み（職人タブ用）
     document.getElementById('lastActiveMsg').textContent = `最終ログイン: ${formatUnixTime(lastActiveUnix)}`;
     document.getElementById('makerPointsMsg').textContent = `職人ポイント: ${makerPoints.toLocaleString()}`;
+    document.getElementById('likesMsg').textContent = `いいね！数: ${likes.toLocaleString()}`;
+    document.getElementById('weeklyMakerPointsMsg').textContent = `週間職人ポイント: ${weeklyMakerPoints.toLocaleString()}`;
+    document.getElementById('uploadedLevelsMsg').textContent = `投稿したコースの数: ${uploadedLevels.toLocaleString()}`;
 
     // 連敗数の黒塗りリセット
     loseStreakMask.textContent = loseStreak;
