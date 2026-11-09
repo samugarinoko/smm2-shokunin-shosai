@@ -34,52 +34,56 @@
         <div id="userName" class="user-name"></div>
       </div>
 
-      <!-- タブ切替ボタン -->
-      <div class="tab-group">
-        <button id="tabBattleBtn" class="tab-btn active">みんバト</button>
-        <button id="tabMakerBtn" class="tab-btn">職人</button>
+      <!-- レート・ランク・連勝連敗情報 -->
+      <div class="info-group">
+        <div id="ratingMsg" class="result-item"></div>
+        <div id="rankMsg" class="result-item"></div>
+        <div id="nextRankMsg" class="result-item highlight"></div>
+        
+        <div id="winStreakMsg" class="result-item"></div>
+        <div class="result-item">
+          現在、<span id="loseStreakMask" class="spoiler-mask" title="クリックで表示">???</span>連敗中
+        </div>
       </div>
 
-      <!-- みんバトコンテンツ -->
-      <div id="battleContent" class="tab-content">
-        <!-- レート・ランク・連勝連敗情報 -->
-        <div class="info-group">
-          <div id="ratingMsg" class="result-item"></div>
-          <div id="rankMsg" class="result-item"></div>
-          <div id="nextRankMsg" class="result-item highlight"></div>
-          
-          <div id="winStreakMsg" class="result-item"></div>
-          <div class="result-item">
-            現在、<span id="loseStreakMask" class="spoiler-mask" title="クリックで表示">???</span>連敗中
-          </div>
-        </div>
+      <hr class="divider">
 
-        <hr class="divider">
-
-        <!-- 通算戦績 -->
-        <div id="totalPlayedMsg" class="result-item"></div>
-        <div id="totalWonMsg" class="result-item"></div>
+      <!-- 通算戦績 -->
+      <div id="totalPlayedMsg" class="result-item"></div>
+      <div id="totalWonMsg" class="result-item"></div>
+      
+      <!-- 勝率と桁数選択 -->
+      <div class="win-rate-container">
         <div id="winRateMsg" class="result-item"></div>
-
-        <hr class="divider">
-
-        <!-- 連勝数入力＆結果 -->
-        <div class="field streak-field">
-          <label for="streakCount">連勝数（勝率計算用）</label>
-          <input type="number" id="streakCount" value="1" min="1">
+        <div class="decimal-selector">
+          <label for="decimalSelect">表示桁数:</label>
+          <select id="decimalSelect">
+            <option value="1">小数第1位</option>
+            <option value="2" selected>小数第2位</option>
+            <option value="3">小数第3位</option>
+            <option value="4">小数第4位</option>
+            <option value="5">小数第5位</option>
+            <option value="6">小数第6位</option>
+            <option value="7">小数第7位</option>
+            <option value="8">小数第8位</option>
+            <option value="9">小数第9位</option>
+            <option value="10">小数第10位</option>
+          </select>
         </div>
+      </div>
+      
+      <!-- およそ何回に1回勝利するか -->
+      <div id="approxWinMsg" class="result-item approx-text"></div>
 
-        <div id="streakWinRateMsg" class="result-item"></div>
+      <hr class="divider">
+
+      <!-- 連勝数入力＆結果 -->
+      <div class="field streak-field">
+        <label for="streakCount">連勝数（勝率計算用）</label>
+        <input type="number" id="streakCount" value="1" min="1">
       </div>
 
-<!-- 職人コンテンツ -->
-<div id="makerContent" class="tab-content" style="display: none;">
-  <div id="lastActiveMsg" class="result-item"></div>
-  <div id="makerPointsMsg" class="result-item"></div>
-  <div id="likesMsg" class="result-item"></div>
-  <div id="weeklyMakerPointsMsg" class="result-item"></div>
-  <div id="uploadedLevelsMsg" class="result-item"></div>
-</div>
+      <div id="streakWinRateMsg" class="result-item"></div>
     </div>
   </div>
 
