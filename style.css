@@ -43,13 +43,46 @@ label {
 }
 
 input[type="text"],
-input[type="number"] {
+input[type="number"],
+select {
   width: 100%;
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 6px;
   box-sizing: border-box;
   font-size: 16px;
+}
+
+.win-rate-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.win-rate-container .result-item {
+  margin-bottom: 0;
+}
+
+.decimal-selector {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+}
+
+.decimal-selector select {
+  padding: 4px 8px;
+  font-size: 13px;
+  width: auto;
+}
+
+.approx-text {
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 8px;
+  font-weight: normal;
 }
 
 .sub-text {
