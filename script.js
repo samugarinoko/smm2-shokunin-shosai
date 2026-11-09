@@ -1,5 +1,6 @@
 const makerIdInput = document.getElementById('makerId');
 const streakInput = document.getElementById('streakCount');
+const decimalSelect = document.getElementById('decimalSelect');
 const saveIdBtn = document.getElementById('saveIdBtn');
 const clearCacheBtn = document.getElementById('clearCacheBtn');
 const loseStreakMask = document.getElementById('loseStreakMask');
@@ -37,18 +38,32 @@ function checkCacheState() {
   }
 }
 
-// 初期化
+// 初期化（保存された職人IDや桁数設定があれば反映）
 window.addEventListener('DOMContentLoaded', () => {
   const savedId = localStorage.getItem('savedMakerId');
   if (savedId) {
     makerIdInput.value = savedId;
   }
+
+  const savedDecimal = localStorage.getItem('savedDecimal');
+  if (savedDecimal) {
+    decimalSelect.value = savedDecimal;
+  }
+
   checkCacheState();
 });
 
 // リアルタイムでハイフン「-」および「ー」を除去
 makerIdInput.addEventListener('input', (e) => {
   e.target.value = e.target.value.replace(/[-ー]/g, '');
+});
+
+// 桁数セレクト変更時にストレージへ保存して即座に再計算
+decimalSelect.addEventListener('change', () => {
+  localStorage.setItem('savedDecimal', decimalSelect.value);
+  if (globalTotalPlayed > 0 || globalVersusWon > 0) {
+    updateCalculations();
+  }
 });
 
 // 黒塗り連敗数マスクのクリックイベント
@@ -61,17 +76,20 @@ saveIdBtn.addEventListener('click', () => {
   const makerId = makerIdInput.value.replace(/[-ー]/g, '').trim();
   if (makerId) {
     localStorage.setItem('savedMakerId', makerId);
+    localStorage.setItem('savedDecimal', decimalSelect.value);
     checkCacheState();
-    alert('職人IDを記憶しました！');
+    alert('職人IDと設定を記憶しました！');
   }
 });
 
 // キャッシュを削除するボタン
 clearCacheBtn.addEventListener('click', () => {
   localStorage.removeItem('savedMakerId');
+  localStorage.removeItem('savedDecimal');
   makerIdInput.value = '';
+  decimalSelect.value = '2'; // デフォルトに戻す
   checkCacheState();
-  alert('記憶した職人ID（キャッシュ）を削除しました。');
+  alert('記憶したキャッシュを削除しました。');
 });
 
 // Unixtime（秒）を 日時文字列（YYYY/MM/DD HH:mm:ss）に変換する関数
@@ -122,28 +140,35 @@ function getNextRankInfo(currentRank, rating) {
 // 勝率と連勝率を再計算して表示する関数
 function updateCalculations() {
   const winRateMsg = document.getElementById('winRateMsg');
+  const approxWinMsg = document.getElementById('approxWinMsg');
   const streakWinRateMsg = document.getElementById('streakWinRateMsg');
 
   const streakCount = parseInt(streakInput.value, 10) || 1;
+  const decimalDigits = parseInt(decimalSelect.value, 10) || 2;
 
-  // プレイ回数が0回の場合は勝率・連勝率を0%にする（ゼロ除算防止）
   if (globalTotalPlayed === 0) {
     winRateMsg.textContent = '勝率: 0.00%';
+    approxWinMsg.textContent = 'およそ 0回に1回勝利';
     streakWinRateMsg.textContent = `${streakCount}連勝の勝率: 0.0000%`;
     return;
   }
 
   const winRatio = globalVersusWon / globalTotalPlayed;
-
   const winRate = winRatio * 100;
+
+  // 選択された桁数（1〜10位）で丸める
+  winRateMsg.textContent = `勝率: ${winRate.toFixed(decimalDigits)}%`;
+
+  // およそ何回に1回勝利するか（プレイ回数 / 勝った回数、小数第一位で四捨五入して整数化）
+  const timesPerWin = Math.round(globalTotalPlayed / globalVersusWon);
+  approxWinMsg.textContent = `およそ ${timesPerWin}回に1回勝利`;
+
   const streakRatio = Math.pow(winRatio, streakCount);
   const streakWinRate = streakRatio * 100;
-
-  winRateMsg.textContent = `勝率: ${winRate.toFixed(2)}%`;
   streakWinRateMsg.textContent = `${streakCount}連勝の勝率: ${streakWinRate.toFixed(4)}%`;
 }
 
-// 連勝数の数値が変わったときに自動で再計算
+// 連勝数や桁数の変更時に自動で再計算
 streakInput.addEventListener('input', () => {
   updateCalculations();
 });
@@ -183,7 +208,7 @@ document.getElementById('calcBtn').addEventListener('click', async () => {
     // 職人タブ用
     const lastActiveMatch = rawText.match(/"last_active":\s*(\d+)\s*,"last_active_pretty/);
     const makerPointsMatch = rawText.match(/"maker_points":\s*(\d+)\s*,"easy_highscore/);
-    const likesMatch = rawText.match(/"likes":\s*(\d+)\s*,"maker_points/);
+    const likesMatch = rawText.matches ? null : rawText.match(/"likes":\s*(\d+)\s*,"maker_points/);
     const weeklyMakerPointsMatch = rawText.match(/"weekly_maker_points":\s*(\d+)\s*,"last_uploaded_level/);
     const uploadedLevelsMatch = rawText.match(/"uploaded_levels":\s*(\d+)\s*,"maximum_uploaded_levels/);
 
